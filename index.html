@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCS Bingo</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#7a42a4',
+                        secondary: '#9468c4',
+                        bgDark: '#221b33',
+                        bgCell: '#312542',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #221b33;
+            color: white;
+            font-family: sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        footer {
+    opacity: 0;
+    animation: fadeIn 1.5s ease-out forwards;
+}
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle linear infinite;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(1); }
+        }
+
+     
+        .spotlight {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 80%);
+            pointer-events: none;
+            z-index: 0;
+            transition: background 2s ease-in-out;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+        #bingoMessage {
+    min-height: 40px;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+#bingoMessage.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+
+.body-loaded .content {
+    animation: fadeInScale 1s ease-out;
+}
+
+.body-loaded .stars {
+    animation: fadeIn 2s ease-out;
+}
+
+.body-loaded .spotlight {
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center p-4 relative">
+
+    <div class="stars"></div> 
+    <div class="spotlight"></div> 
+
+    <div class="content">
+        <div class="flex justify-center my-4">
+            <img class="w-20 sm:w-24" src="./thin_logo.png" alt="Logo">
+        </div>
+
+        <div id="bingoMessage" class="text-3xl text-secondary font-bold mb-4 opacity-0 transition-opacity duration-500">
+            БИНГО!
+        </div>
+
+        <div class="bg-white/10 rounded-xl shadow-xl p-4 w-full max-w-3xl">
+            <div id="bingoGrid" class="grid grid-cols-6 gap-2"></div>
+        </div>
+    </div>
+    <footer class="mt-auto text-center text-white/50 text-sm py-2">
+        © MCS 1 SEASON
+    </footer>
+    <script>
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const numStars = 100;
+
+            for (let i = 0; i < numStars; i++) {
+                let star = document.createElement("div");
+                star.className = "star";
+                let size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        createStars();
+
+        const bingoData = [
+            "Левен забанен", "Авав приходит", "Плагин на инвалидную каляску", "Пусть говорят с Таро и Культистом",
+            "Син в тюрьме", "Овцекраска", "Син забанена", "Авав уходит", "Бубен не бездомный", "Кольцо на краю мира",
+            "AVE SOLIS", "Что-то идет не так", "Рохан достроил замок", "ЛОР СУЩЕСТВУЕТ", "Сорайтес умер",
+            "За яйцо и двор стрельнули в упор", "Пустошь.", "Метеориты", "Вадик достроил мост", "Лт не пришел",
+            "Бом бом 32", "Махунта снова сценарист", "Рохан стримлер", "Баня - новый спавн", "Бубенчик's girlfriend reveal",
+            "Игра в кальмара in peace", "Дней без лора: 32", "Школьник повзрослел", "Син не судья?",
+            "Они РЕАЛЬНО что-то делают", "Мы верим в карму", "Тыквенный пирог", "Культист не одинок",
+            "Taro whitewashing", "Вадик и монолит", "Плагин на голосовые сообщения"
+        ];
+
+function shuffleArray(array) {
+    let shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+
+let savedBingoData = localStorage.getItem("bingoOrder");
+
+if (!savedBingoData) {
+    
+    savedBingoData = shuffleArray(bingoData);
+    localStorage.setItem("bingoOrder", JSON.stringify(savedBingoData));
+} else {
+    
+    savedBingoData = JSON.parse(savedBingoData);
+}
+
+function createGrid() {
+    const grid = document.getElementById("bingoGrid");
+
+    savedBingoData.forEach((item, index) => {
+        const cell = document.createElement("div");
+        cell.className = `
+            bg-bgCell border-2 border-primary text-xs sm:text-sm p-2 
+            rounded-lg shadow-md text-center cursor-pointer 
+            transition-all duration-300 hover:bg-primary/80 
+            flex items-center justify-center aspect-square 
+            overflow-hidden break-words
+        `;
+        cell.textContent = item;
+        cell.dataset.index = index;
+
+        if (localStorage.getItem(`cell-${index}`) === 'active') {
+            cell.classList.add('active', 'bg-primary');
+        }
+
+        cell.addEventListener("click", () => {
+            cell.classList.toggle("active");
+            cell.classList.toggle("bg-primary");
+
+            if (cell.classList.contains("active")) {
+                localStorage.setItem(`cell-${index}`, 'active');
+            } else {
+                localStorage.removeItem(`cell-${index}`);
+            }
+
+            highlightWinningCells();
+        });
+
+        grid.appendChild(cell);
+    });
+
+    highlightWinningCells();
+}
+
+
+
+
+        function highlightWinningCells() {
+    const cells = document.querySelectorAll("#bingoGrid > div");
+    const bingoMessage = document.getElementById("bingoMessage");
+    const size = 6;
+    let bingoCount = 0;
+
+    cells.forEach(cell => cell.classList.remove("ring-4", "ring-secondary"));
+
+    for (let i = 0; i < size; i++) {
+        const row = [...cells].slice(i * size, (i + 1) * size);
+        const col = [...cells].filter((_, idx) => idx % size === i);
+
+        [row, col].forEach(line => {
+            if (line.every(c => c.classList.contains("active"))) {
+                bingoCount++;
+                line.forEach(c => c.classList.add("ring-4", "ring-secondary"));
+            }
+        });
+    }
+
+    
+    const diag1 = [...Array(size)].map((_, j) => cells[j * size + j]);
+    const diag2 = [...Array(size)].map((_, j) => cells[j * size + (size - 1 - j)]);
+
+    if (diag1.every(c => c.classList.contains("active"))) {
+        bingoCount++;
+        diag1.forEach(c => c.classList.add("ring-4", "ring-secondary"));
+    }
+
+    if (diag2.every(c => c.classList.contains("active"))) {
+        bingoCount++;
+        diag2.forEach(c => c.classList.add("ring-4", "ring-secondary"));
+    }
+
+    
+    if (bingoCount > 0) {
+        bingoMessage.textContent = `БИНГО${bingoCount > 1 ? ` x${bingoCount}` : ''}!`;
+        bingoMessage.classList.add("show");
+    } else {
+        bingoMessage.classList.remove("show");
+    }
+}
+
+
+        createGrid();
+        document.addEventListener("DOMContentLoaded", () => {
+    document.body.classList.add("body-loaded");
+});
+
+    </script>
+
+</body>
+
+</html>
