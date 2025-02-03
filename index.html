@@ -121,6 +121,37 @@
 .body-loaded .spotlight {
     animation: fadeIn 1.5s ease-in-out;
 }
+@media (max-width: 640px) { /* Для мобильных устройств */
+    #bingoGrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 колонки вместо 6 */
+        gap: 4px; /* Уменьшаем расстояние между ячейками */
+    }
+
+    .content {
+        width: 100%;
+        padding: 8px;
+    }
+
+    .bg-white\/10 {
+        padding: 8px; /* Уменьшаем внутренние отступы контейнера */
+    }
+
+    .text-3xl {
+        font-size: 1.5rem; /* Уменьшаем размер заголовка "БИНГО!" */
+    }
+
+    .star {
+        width: 1px !important;
+        height: 1px !important;
+    }
+}
+
+/* Улучшаем прокрутку на мобильных */
+@media (max-width: 480px) {
+    body {
+        overflow-y: auto; /* Разрешаем прокрутку по вертикали */
+    }
+}
 
     </style>
 </head>
@@ -202,14 +233,18 @@ if (!savedBingoData) {
 function createGrid() {
     const grid = document.getElementById("bingoGrid");
 
+    if (window.innerWidth <= 640) {
+        grid.style.gridTemplateColumns = "repeat(3, minmax(0, 1fr))"; // 3 колонки на мобильных
+    }
+
     savedBingoData.forEach((item, index) => {
         const cell = document.createElement("div");
         cell.className = `
-            bg-bgCell border-2 border-primary text-xs sm:text-sm p-2 
+            bg-bgCell border-2 border-primary text-xs sm:text-sm p-1 
             rounded-lg shadow-md text-center cursor-pointer 
             transition-all duration-300 hover:bg-primary/80 
             flex items-center justify-center aspect-square 
-            overflow-hidden break-words
+            overflow-hidden break-words text-[12px] sm:text-[14px]
         `;
         cell.textContent = item;
         cell.dataset.index = index;
@@ -236,7 +271,6 @@ function createGrid() {
 
     highlightWinningCells();
 }
-
 
 
 
