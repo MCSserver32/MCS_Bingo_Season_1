@@ -77,11 +77,25 @@
             position: relative;
             z-index: 1;
         }
-        #bingoMessage {
+#bingoMessage {
     min-height: 40px;
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
+    font-size: 1.5rem; /* Базовый размер */
+}
+
+/* Меняем размер текста адаптивно */
+@media (max-width: 768px) {
+    #bingoMessage {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #bingoMessage {
+        font-size: 1rem;
+    }
 }
 #bingoMessage.show {
     visibility: visible;
@@ -146,11 +160,17 @@
     }
 }
 
-/* Улучшаем прокрутку на мобильных */
-@media (max-width: 480px) {
-    body {
-        overflow-y: auto; /* Разрешаем прокрутку по вертикали */
+/* Уменьшаем размер ячеек на маленьких экранах */
+@media (max-width: 1024px) {
+    #bingoGrid {
+        gap: 4px;
     }
+}
+        #bingoGrid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr)); /* Всегда 6 колонок */
+    gap: 6px;
+    width: 100%;
 }
 
     </style>
@@ -232,19 +252,17 @@ if (!savedBingoData) {
 
 function createGrid() {
     const grid = document.getElementById("bingoGrid");
-
-    if (window.innerWidth <= 640) {
-        grid.style.gridTemplateColumns = "repeat(3, minmax(0, 1fr))"; // 3 колонки на мобильных
-    }
-
+    
     savedBingoData.forEach((item, index) => {
         const cell = document.createElement("div");
         cell.className = `
-            bg-bgCell border-2 border-primary text-xs sm:text-sm p-1 
+            bg-bgCell border-2 border-primary 
+            p-1 sm:p-2 md:p-3 lg:p-4 /* Меняем отступы для адаптивности */
             rounded-lg shadow-md text-center cursor-pointer 
             transition-all duration-300 hover:bg-primary/80 
             flex items-center justify-center aspect-square 
-            overflow-hidden break-words text-[12px] sm:text-[14px]
+            overflow-hidden break-words 
+            text-[10px] sm:text-xs md:text-sm lg:text-md xl:text-lg /* Размер текста адаптивный */
         `;
         cell.textContent = item;
         cell.dataset.index = index;
