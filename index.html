@@ -145,11 +145,7 @@ footer {
         
         grid-template-columns: repeat(6, 1fr); /* 3 колонки вместо 6 */
         gap: 5px;
-        font-size: 5px;
-        *{
-            border-radius: 0px;
-            font-size: 5px;
-        }
+   
     }
 
     .content {
@@ -179,7 +175,7 @@ footer {
         padding-top: 1vh;
     
     }
-    #bingoGrid { *{font-size: 8px !important; }}
+    #bingoGrid { *{font-size: 6px !important; }}
 }
 
 /* === Уменьшаем расстояние между ячейками на узких экранах === */
@@ -188,6 +184,21 @@ footer {
         gap: 4px;
      }
 }
+/* Для устройств с поддержкой ховера */
+@media (hover: hover) {
+    .bingo-cell:hover {
+        background-color: rgb(140, 82, 173); /* Цвет фона при наведении */
+    }
+}
+
+/* Для устройств без поддержки ховера (например, мобильные устройства) */
+@media (hover: none) {
+    .bingo-cell:active {
+        background-color:rgb(140, 82, 173); /* Цвет фона при нажатии */
+    }
+}
+
+
 
     </style>
   </head>
@@ -295,47 +306,53 @@ footer {
       } else {
         savedBingoData = JSON.parse(savedBingoData);
       }
-
       function createGrid() {
-        const grid = document.getElementById("bingoGrid");
+    const grid = document.getElementById("bingoGrid");
 
-        savedBingoData.forEach((item, index) => {
-          const cell = document.createElement("div");
-          cell.className = `
+    savedBingoData.forEach((item, index) => {
+        const cell = document.createElement("div");
+        
+        // Добавляем класс bingo-cell для стилизации
+        cell.className = `
+            bingo-cell 
             bg-bgCell border-2 border-primary 
             p-1 sm:p-2 md:p-3 lg:p-4
             rounded-lg shadow-md text-center cursor-pointer 
-            transition-all duration-300 hover:bg-primary/80 
-            flex items-center justify-center 
+            transition-all duration-300 flex items-center justify-center 
             overflow-hidden break-words 
             text-[10px] sm:text-xs md:text-sm lg:text-base xl:text-lg
             aspect-square
         `;
-          cell.textContent = item;
-          cell.dataset.index = index;
+        cell.textContent = item;
+        cell.dataset.index = index;
 
-          if (localStorage.getItem(`cell-${index}`) === "active") {
+        // Проверяем, активна ли ячейка и сохраняем состояние
+        if (localStorage.getItem(`cell-${index}`) === "active") {
             cell.classList.add("active", "bg-primary");
-          }
+        }
 
-          cell.addEventListener("click", () => {
+        // Обработчик клика для активации
+        cell.addEventListener("click", () => {
             cell.classList.toggle("active");
             cell.classList.toggle("bg-primary");
 
             if (cell.classList.contains("active")) {
-              localStorage.setItem(`cell-${index}`, "active");
+                localStorage.setItem(`cell-${index}`, "active");
             } else {
-              localStorage.removeItem(`cell-${index}`);
+                localStorage.removeItem(`cell-${index}`);
             }
 
             highlightWinningCells();
-          });
-
-          grid.appendChild(cell);
         });
 
-        highlightWinningCells();
-      }
+        // Добавляем ячейку в сетку
+        grid.appendChild(cell);
+    });
+
+    // Подсвечиваем выигрышные ячейки
+    highlightWinningCells();
+}
+
 
       function highlightWinningCells() {
         const cells = document.querySelectorAll("#bingoGrid > div");
