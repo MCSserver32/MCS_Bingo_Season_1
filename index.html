@@ -168,16 +168,37 @@ footer {
         padding-top: 10vh;
     }
 }
+@media (max-width: 720px) {
+    .content {
+        justify-content: flex-start;
+        padding-top: 10vh;
+    }
+    #bingoGrid { *{font-size: 13px !important; padding: 2px; }}
+}
 
+@media (max-width: 620px) {
+    .content {
+        justify-content: flex-start;
+        padding-top: 10vh;
+    }
+    #bingoGrid { *{font-size: 9px !important; padding: 2px; }}
+}
 /* === Улучшения для узких экранов === */
 @media (max-width: 480px) {
     .content {
         padding-top: 1vh;
     
     }
-    #bingoGrid { *{font-size: 6px !important;padding: 2px; }}
+    #bingoGrid { *{font-size: 6px !important; padding: 2px; }}
 }
 
+@media (max-width: 375px) {
+    .content {
+        padding-top: 1vh;
+    
+    }
+    #bingoGrid { *{font-size: 4px !important; padding: 2px; }}
+}
 /* === Уменьшаем расстояние между ячейками на узких экранах === */
 @media (max-width: 1024px) {
     #bingoGrid { 
